@@ -4,7 +4,7 @@ const DWORD windowStyle = WS_OVERLAPPED & !WS_SIZEBOX | WS_SYSMENU;
 const DWORD inputStyle = WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_CENTER;
 const DWORD outputStyle = WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_CENTER | WS_BORDER | WS_SYSMENU;
 const int maxInputStringLength = 128;
-RECT clientRect = {0, 0, 800, 200};
+RECT clientRect = {0, 0, 1000, 200};
 HWND hMainWindow, hInputForm, hOutputForm;
 const wchar_t space = L' ';
 wchar_t *inputText, *outputText;
@@ -28,14 +28,16 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int part = clientRect.bottom / 4;
 	hInputForm = CreateWindowExW(0, editClass, NULL, inputStyle, 0, 0, clientRect.right, part, hMainWindow, 0, 0, 0);
 	hOutputForm = CreateWindowExW(0, editClass, NULL, outputStyle, 0, part, clientRect.right, clientRect.bottom - part, hMainWindow, 0, 0, 0);
-	SendMessage(hOutputForm, WM_SETFONT, (WPARAM)CreateFontW(0, 0, 0, 0, FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, fontName), true);
+	HFONT hFont = CreateFontW(0, 0, 0, 0, FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH | FF_MODERN, fontName);
+	SendMessage(hOutputForm, WM_SETFONT, (WPARAM)hFont, true);
 
 	MSG msg;
 	while (GetMessage(&msg, 0, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	ExitProcess(0);
+
+	return 0;
 
 }
 

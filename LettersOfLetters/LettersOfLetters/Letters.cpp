@@ -3,17 +3,17 @@
 const DWORD windowStyle = WS_OVERLAPPED & !WS_SIZEBOX | WS_SYSMENU;
 const DWORD inputStyle = WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_CENTER;
 const DWORD outputStyle = WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_CENTER | WS_BORDER | WS_SYSMENU;
-const int maxInputStringLength = 128;
-RECT clientRect = {0, 0, 1000, 200};
-HWND hMainWindow, hInputForm, hOutputForm;
+const int maxInputStringLength = 128, width = 3, height = 5;
 const wchar_t space = L' ';
-wchar_t *inputText, *outputText;
 const wchar_t *const editClass = L"EDIT";
 const wchar_t *const fontName = L"Courier New";
 const wchar_t *const caption = L"Letters of letters";
 const wchar_t *const mainClassName = L"MainClass";
+RECT clientRect = {0, 0, 1000, 200};
+HWND hMainWindow, hInputForm, hOutputForm;
+wchar_t *inputText, *outputText;
 
-WNDCLASSEXW WndClassEx = {sizeof(WNDCLASSEX), 0, (WNDPROC)WindowProc, 0, 0, 0, 0, 0, 0, 0, (LPCWSTR)mainClassName, 0};
+WNDCLASSEXW WndClassEx = {sizeof(WNDCLASSEX), CS_GLOBALCLASS, (WNDPROC)WindowProc, 0, 0, 0, 0, 0, 0, 0, (LPCWSTR)mainClassName, 0};
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -21,7 +21,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WndClassEx.hInstance = hInstance;
 	WndClassEx.hCursor = LoadCursor(0, IDC_ARROW);
 	RegisterClassEx(&WndClassEx);
-	hMainWindow = CreateWindowExW(0, mainClassName, (LPCWSTR)caption, windowStyle, 0, 0, clientRect.right, clientRect.bottom, 0, 0, hInstance, 0);
+	hMainWindow = CreateWindowExW(0, mainClassName, (LPCWSTR)caption, windowStyle, 0, 0, clientRect.right, clientRect.bottom, 0, 0, 0, 0);
 	ShowWindow(hMainWindow, SW_SHOWNORMAL);
 	UpdateWindow(hMainWindow);
 	GetClientRect(hMainWindow, &clientRect);
@@ -45,18 +45,15 @@ LRESULT WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 
 	switch (uMsg) {
-	case WM_SIZE:
-		GetClientRect(hWnd, &clientRect);
-		return 0;
 	case WM_DESTROY:
 		ExitProcess(0);
 	case WM_COMMAND:
 		inputText = (wchar_t *)calloc(maxInputStringLength + 1, sizeof(wchar_t));
 		if (int length = GetWindowTextW(hInputForm, inputText, maxInputStringLength)) {
-			int size = maxInputStringLength * 3 * (5 + 1) * 2 + 5 * 2 + 1;
+			int size = (maxInputStringLength * ((width + 1) * 2 + 2) * height + 1) * sizeof(wchar_t);
 			outputText = (wchar_t *)calloc(size, sizeof(wchar_t));
 			int index = 0;
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < height; i++) {
 				for (int sourceIndex = 0; sourceIndex < length; sourceIndex++) {
 					wchar_t c = inputText[sourceIndex];
 					int tableIndex;
@@ -66,13 +63,13 @@ LRESULT WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						tableIndex = c - 'a';
 						c = tableIndex + 'A';
 					} else {
-						for (int j = 0; j < 8; j++) {
+						for (int j = 0; j < (width + 1) * 2; j++) {
 							outputText[index++] = space;
 						}
 						continue;
 					}
-					for (int j = 0; j < 3; j++) {
-						if (letters[tableIndex * 15 + j + i * 3]) {
+					for (int j = 0; j < width; j++) {
+						if (letters[tableIndex * width * height + j + i * width]) {
 							outputText[index++] = c;
 							outputText[index++] = c;
 						} else {
@@ -99,6 +96,7 @@ LRESULT WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 	}
+
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 
 }

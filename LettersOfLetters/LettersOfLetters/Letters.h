@@ -1,4 +1,13 @@
+#ifndef __LETTERS_H__
+#define __LETTERS_H__
+
 #include <Windows.h>
+
+#define CLASS_NAME L"MainClass"
+#define CAPTION L"Letters of letters"
+#define SPACE L' '
+#define EDIT L"EDIT"
+#define COURIER_NEW L"Courier New"
 
 byte letters[] = 
 {
@@ -160,5 +169,7 @@ byte letters[] =
 	1, 1, 1
 };
 
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int);
-LRESULT WindowProc(HWND, UINT, WPARAM, LPARAM);
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
+LRESULT WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+#endif // __LETTERS_H__
